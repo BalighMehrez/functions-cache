@@ -77,3 +77,4 @@ def _get_default_engine_name():
     if 'sqlite' in registry:
         return 'sqlite'
     return 'memory'
+

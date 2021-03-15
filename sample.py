@@ -9,11 +9,12 @@ my_cache = {}
 @cache_it(as_daemon=True)
 def sample_func(a, b):
     time.sleep(2)
-    return (a + b) * random.random()
+    result = {"a": a,"b": b, "random": random.random()}
+    return result
 
 
 if __name__ == "__main__":
     for i in range(10):
-        print(sample_func(5, 5))
-
-        time.sleep(1)
+        for j in range(4):
+            print(sample_func(i, i))
+            time.sleep(1)

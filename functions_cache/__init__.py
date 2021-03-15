@@ -1,8 +1,13 @@
 import functools
 import threading
 from threading import Thread
+import functions_cache.engines as engines
+from functions_cache.function_identifier import FunctionIdentifier
+global my_cache
+my_cache = engines.create_engine('sqlite','functions-cache',{})
 
-my_cache = {}
+# def config_engine():
+#     my_cache = engines.create_engine()
 
 def cache_it(_func=None, *, as_daemon=False):
 
@@ -10,19 +15,20 @@ def cache_it(_func=None, *, as_daemon=False):
 
         @functools.wraps(func)
         def wrapper_cache_it(*args, **kwargs):
-            key = (func.__name__, args, hash(tuple(sorted(kwargs))))
-            if key in my_cache:
-                result = my_cache[key]
+            identifier = FunctionIdentifier(func.__name__,args,kwargs)
+            key = my_cache.create_key(identifier)
+            if my_cache.has_key(key):
+                result = my_cache.get_response_and_time(key)[0]
 
                 def threaded_func():
-                    my_cache[key] = func(*args, **kwargs)
+                    my_cache.save_response(key,func(*args, **kwargs))
 
                 t = threading.Thread(target=threaded_func, daemon=as_daemon)
                 t.start()
 
             else:
                 result = func(*args, **kwargs)
-                my_cache[key] = result
+                my_cache.save_response(key,result)
             return result
         return wrapper_cache_it
 

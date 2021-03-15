@@ -27,4 +27,3 @@ class DynamoDbCache(BaseCache):
             options.get('read_capacity_units'),
             options.get('write_capacity_units'),
         )
-        self.keys_map = DynamoDbDict(table_name, 'urls', self.responses.connection)

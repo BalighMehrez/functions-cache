@@ -19,4 +19,3 @@ class RedisCache(BaseCache):
         """
         super().__init__(**options)
         self.responses = RedisDict(namespace, 'responses', options.get('connection'))
-        self.keys_map = RedisDict(namespace, 'urls', self.responses.connection)
