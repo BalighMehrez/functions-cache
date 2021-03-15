@@ -9,7 +9,7 @@ my_cache = engines.create_engine('sqlite','functions-cache',{})
 # def config_engine():
 #     my_cache = engines.create_engine()
 
-def cache_it(_func=None, *, as_daemon=False):
+def cache_it(_func=None, *, as_daemon=False, is_static=True):
 
     def decorator_cache_it(func):
 
@@ -20,11 +20,13 @@ def cache_it(_func=None, *, as_daemon=False):
             if my_cache.has_key(key):
                 result = my_cache.get_response_and_time(key)[0]
 
-                def threaded_func():
-                    my_cache.save_response(key,func(*args, **kwargs))
+                if not is_static:
 
-                t = threading.Thread(target=threaded_func, daemon=as_daemon)
-                t.start()
+                    def threaded_func():
+                        my_cache.save_response(key,func(*args, **kwargs))
+
+                    t = threading.Thread(target=threaded_func, daemon=as_daemon)
+                    t.start()
 
             else:
                 result = func(*args, **kwargs)
