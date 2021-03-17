@@ -5,11 +5,11 @@ import functions_cache.engines as engines
 from functions_cache.function_identifier import FunctionIdentifier
 global my_cache
 my_cache = engines.create_engine('sqlite','functions-cache',{})
-
+threadLimiter = threading.BoundedSemaphore(4)
 # def config_engine():
 #     my_cache = engines.create_engine()
 
-def cache_it(_func=None, *, as_daemon=False, is_static=True):
+def cache_it(_func=None, *, as_daemon=True, is_static=False):
 
     def decorator_cache_it(func):
 
@@ -23,7 +23,12 @@ def cache_it(_func=None, *, as_daemon=False, is_static=True):
                 if not is_static:
 
                     def threaded_func():
-                        my_cache.save_response(key,func(*args, **kwargs))
+                        threadLimiter.acquire()
+                        try:
+                            my_cache.save_response(key,func(*args, **kwargs))
+                        finally:
+                            threadLimiter.release()
+                        
 
                     t = threading.Thread(target=threaded_func, daemon=as_daemon)
                     t.start()
