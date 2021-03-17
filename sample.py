@@ -3,7 +3,7 @@ import datetime
 
 
 
-@cache_it(as_daemon=True)
+@cache_it
 def fab_cached(n):
     if n < 2:
         return n
