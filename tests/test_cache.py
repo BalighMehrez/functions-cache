@@ -2,9 +2,6 @@
 import unittest
 from datetime import datetime
 
-import requests
-from requests import Request
-
 
 from functions_cache import cache_it,config_engine,engines
 
